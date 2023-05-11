@@ -15,4 +15,11 @@ typedef struct Noeud{
     struct Noeud* filsDroite;
 }T_Noeud;
 
+typedef struct Index{
+    int numeroLigne;
+    int ordre;
+    int numeroPhrase;
+    struct Position* suivant;
+}T_Index;
+
 #endif //TP4_TP4_H
