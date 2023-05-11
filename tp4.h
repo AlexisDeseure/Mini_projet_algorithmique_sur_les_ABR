@@ -6,4 +6,5 @@ typedef struct Position{
     int numeroPhrase;
     struct Position* suivant;
 }T_Position;
+
 #endif //TP4_TP4_H
