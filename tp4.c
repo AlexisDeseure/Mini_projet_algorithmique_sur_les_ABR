@@ -3,7 +3,6 @@
 #include <string.h>
 #include "tp4.h"
 
-int main() {
+T_Position *ajouterPosition(T_Position *listeP, int ligne, int ordre, int phrase){
 
-    return 0;
 }
