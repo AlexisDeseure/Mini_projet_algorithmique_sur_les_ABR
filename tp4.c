@@ -40,9 +40,22 @@ T_Index* creerIndex() {
     return new;
 }
 T_Position *ajouterPosition(T_Position *listeP, int ligne, int ordre, int phrase){
-    T_Position* premierElement = listeP;
+    T_Position *pos_int = listeP;
+    T_Position *P = creerPosition(ligne,ordre,phrase);
+    if(listeP==NULL){
+        return P;
+    }
+    else{
+        while(pos_int->suivant != NULL && (pos_int->suivant->numeroLigne<P->numeroLigne || pos_int->suivant->ordre<P->ordre) ){
+            pos_int=pos_int->suivant;
+        }
+        P->suivant=pos_int->suivant;
+        pos_int->suivant=P;
+    }
+    return listeP;
 }
 
 int ajouterOccurence(T_Index *index, char *mot, int ligne, int ordre, int phrase){
 
 }
+
