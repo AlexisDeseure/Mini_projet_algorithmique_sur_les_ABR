@@ -49,6 +49,7 @@ void ignorerCasse(char* mot){
         if (mot[index]>=65 && mot[index]<=90){
             mot[index]+=32;
         }
+        index++;
     }
 }
 
