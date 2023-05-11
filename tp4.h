@@ -16,11 +16,15 @@ typedef struct Noeud{
 }T_Noeud;
 
 typedef struct Index{
-    int numeroLigne;
-    int ordre;
-    int numeroPhrase;
-    struct Position* suivant;
+    T_Noeud* racine;
+    int nbMotsDistincts;
+    int nbMotsTotal;
 }T_Index;
+
+//fonctions d'initialisation
+T_Position* creerPosition(int ligne, int ordre, int phrase);
+T_Noeud * creerNoeud(char* mot, T_Position* debut);
+T_Index* creerIndex();
 
 T_Position *ajouterPosition(T_Position *listeP, int ligne, int ordre, int phrase);
 
