@@ -22,4 +22,21 @@ typedef struct Index{
     struct Position* suivant;
 }T_Index;
 
+T_Position *ajouterPosition(T_Position *listeP, int ligne, int ordre, int phrase);
+
+int ajouterOccurence(T_Index *index, char *mot, int ligne, int ordre, int phrase);
+
+int indexerFichier(T_Index *index, char *filename);
+
+void afficherIndex(T_Index index);
+
+T_Noeud* rechercherMot(T_Index index, char *mot);
+
+void afficherOccurencesMot(T_Index index, char *mot);
+
+void construireTexte(T_Index index, char *filename);
+
+
+
+
 #endif //TP4_TP4_H
