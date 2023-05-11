@@ -70,5 +70,28 @@ T_Position *ajouterPosition(T_Position *listeP, int ligne, int ordre, int phrase
 }
 
 int ajouterOccurence(T_Index *index, char *mot, int ligne, int ordre, int phrase){
+    T_Noeud *parc = index->racine;
+    char *motparc;
+    char *motmin = mot;
+    ignorerCasse(motmin); //Copie en minuscule du mot entré en paramètre pour ne pas le perdre
+    if (index == NULL){
+        T_Position *P = creerPosition(ligne,ordre,phrase);
+        index->racine = creerNoeud(mot,P);
+        index->nbMotsDistincts=1;
+        index->nbMotsTotal=1;
+    }
+    else{
+        while(parc->filsDroite!=NULL || parc->filsGauche!=NULL){
+            int len = strlen(parc->mot);
+            char *motparc = malloc(len*sizeof(char));
+            strcpy(motparc,parc->mot);
+            ignorerCasse(motparc);
+            if(strcmp()){
 
+            }
+            else if(){
+
+            }
+        }
+    }
 }
