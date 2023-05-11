@@ -39,6 +39,19 @@ T_Index* creerIndex() {
     }
     return new;
 }
+
+void ignorerCasse(char* mot){
+    if (mot == NULL || strcmp(mot, "\0") == 0){
+        return;
+    }
+    int index = 0;
+    while (mot[index]!='\0'){
+        if (mot[index]>=65 && mot[index]<=90){
+            mot[index]+=32;
+        }
+    }
+}
+
 T_Position *ajouterPosition(T_Position *listeP, int ligne, int ordre, int phrase){
     T_Position *pos_int = listeP;
     T_Position *P = creerPosition(ligne,ordre,phrase);
@@ -58,4 +71,3 @@ T_Position *ajouterPosition(T_Position *listeP, int ligne, int ordre, int phrase
 int ajouterOccurence(T_Index *index, char *mot, int ligne, int ordre, int phrase){
 
 }
-
