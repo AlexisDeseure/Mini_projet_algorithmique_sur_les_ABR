@@ -1,0 +1,3 @@
+C:/Users/alexi/OneDrive/Documents/Projets info/C/TP4/cmake-build-debug/CMakeFiles/TP4.dir
+C:/Users/alexi/OneDrive/Documents/Projets info/C/TP4/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/alexi/OneDrive/Documents/Projets info/C/TP4/cmake-build-debug/CMakeFiles/rebuild_cache.dir
