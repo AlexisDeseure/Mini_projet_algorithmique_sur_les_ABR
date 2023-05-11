@@ -7,4 +7,12 @@ typedef struct Position{
     struct Position* suivant;
 }T_Position;
 
+typedef struct Noeud{
+    char* mot;
+    int nbOccurences;
+    T_Position *ListePositions;
+    struct Noeud* filsGauche;
+    struct Noeud* filsDroite;
+}T_Noeud;
+
 #endif //TP4_TP4_H
