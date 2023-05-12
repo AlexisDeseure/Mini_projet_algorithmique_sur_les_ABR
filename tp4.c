@@ -83,22 +83,37 @@ int ajouterOccurence(T_Index *index, char *mot, int ligne, int ordre, int phrase
         return 1;
     }
     else{
-        while(parc->filsDroite!=NULL || parc->filsGauche!=NULL){
+        while(parc != NULL){
             int len = strlen(parc->mot);
             char *motparc = malloc(len*sizeof(char));
             strcpy(motparc,parc->mot);
             ignorerCasse(motparc);
-            if(strcmp(motmin,motparc)<0){
+            if(strcmp(motmin,motparc)<0){ // On va à gauche
+                if(parc->filsGauche == NULL){ //Si le suivant est nul
+                    P = creerPosition(ligne,ordre,phrase);
+                    parc->filsGauche = creerNoeud(mot,P);
+                    index->nbMotsDistincts +=1;
+                    index->nbMotsTotal +=1;
+                    return 1;
+                }
                 parc = parc->filsGauche;
                 free(motparc);
             }
-            else if(strcmp(motmin,motparc)>0){
+            else if(strcmp(motmin,motparc)>0){ //On va à droite
+                if(parc->filsDroite == NULL){ //Si le suivant est nul
+                    P = creerPosition(ligne,ordre,phrase);
+                    parc->filsDroite = creerNoeud(mot,P);
+                    index->nbMotsDistincts +=1;
+                    index->nbMotsTotal +=1;
+                    return 1;
+                }
                 parc = parc->filsDroite;
                 free(motparc);
             }
-            else if(!strcmp(motmin,motparc)){
+            else if(!strcmp(motmin,motparc)){ //Si le mot est déjà dans le ABR, on rajoute juste une occurence
                 ajouterPosition(parc->ListePositions, ligne, ordre, phrase);
                 parc->nbOccurences +=1;
+                index->nbMotsTotal +=1;
                 return 1;
             }
         }
