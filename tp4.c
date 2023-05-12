@@ -73,12 +73,14 @@ int ajouterOccurence(T_Index *index, char *mot, int ligne, int ordre, int phrase
     T_Noeud *parc = index->racine;
     char *motparc;
     char *motmin = mot;
+    T_Position *P;
     ignorerCasse(motmin); //Copie en minuscule du mot entré en paramètre pour ne pas le perdre
     if (index == NULL){
-        T_Position *P = creerPosition(ligne,ordre,phrase);
+        P = creerPosition(ligne,ordre,phrase);
         index->racine = creerNoeud(mot,P);
         index->nbMotsDistincts=1;
         index->nbMotsTotal=1;
+        return 1;
     }
     else{
         while(parc->filsDroite!=NULL || parc->filsGauche!=NULL){
@@ -86,12 +88,20 @@ int ajouterOccurence(T_Index *index, char *mot, int ligne, int ordre, int phrase
             char *motparc = malloc(len*sizeof(char));
             strcpy(motparc,parc->mot);
             ignorerCasse(motparc);
-            if(strcmp()){
-
+            if(strcmp(motmin,motparc)<0){
+                parc = parc->filsGauche;
+                free(motparc);
             }
-            else if(){
-
+            else if(strcmp(motmin,motparc)>0){
+                parc = parc->filsDroite;
+                free(motparc);
+            }
+            else if(!strcmp(motmin,motparc)){
+                ajouterPosition(parc->ListePositions, ligne, ordre, phrase);
+                parc->nbOccurences +=1;
+                return 1;
             }
         }
+        return 0;
     }
 }
