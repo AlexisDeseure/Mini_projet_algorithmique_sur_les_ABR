@@ -23,7 +23,7 @@ typedef struct Index{
 
 //fonctions d'initialisation
 T_Position* creerPosition(int ligne, int ordre, int phrase);
-T_Noeud * creerNoeud(char* mot, T_Position* debut);
+T_Noeud * creerNoeud(char* mot, int ligne, int ordre, int phrase);
 T_Index* creerIndex();
 void ignorerCasse(char* mot);
 T_Position *ajouterPosition(T_Position *listeP, int ligne, int ordre, int phrase);

@@ -14,20 +14,23 @@ T_Position* creerPosition(int ligne, int ordre, int phrase){
     return new;
 }
 
-T_Noeud * creerNoeud(char* mot, T_Position* debut){
+
+T_Noeud * creerNoeud(char* mot, int ligne, int ordre, int phrase){
     T_Noeud *new = malloc(sizeof(T_Noeud));
+    T_Position *P = creerPosition(ligne, ordre, phrase);
     if (new!=NULL) {
         //allocation réussi
         new->mot = malloc(strlen(mot) + 1);
         strcpy(new->mot,mot);
-        new->ListePositions = debut;
+        new->ListePositions = P;
         new->nbOccurences = 1;
         //un noeud ne peut exister sans occurence
         new->filsDroite = NULL;
         new->filsGauche = NULL;
     }
     return new;
-}
+}//Crée un noeud, et rajoute une position en son début
+//On ne se sert plus d'une position en entrée, on met toutes les données du noeud, cela permet à faire moins de lignes de code quand on veut créer un nouveau noeud, car on doit pas créer la position à chaque fois
 
 T_Index* creerIndex() {
     T_Index * new= malloc(sizeof(T_Index));
@@ -70,11 +73,9 @@ T_Position *ajouterPosition(T_Position *listeP, int ligne, int ordre, int phrase
 }
 
 int ajouterOccurence(T_Index *index, char *mot, int ligne, int ordre, int phrase){
-    T_Position *P;
     if (index == NULL){
         index = creerIndex();
-        P = creerPosition(ligne,ordre,phrase);
-        index->racine = creerNoeud(mot,P);
+        index->racine = creerNoeud(mot,ligne, ordre, phrase);
         index->nbMotsDistincts++;
         index->nbMotsTotal++;
         return 1;
@@ -89,8 +90,7 @@ int ajouterOccurence(T_Index *index, char *mot, int ligne, int ordre, int phrase
             ignorerCasse(motparc);
             if(strcmp(motmin,motparc)<0){ // On va à gauche
                 if(parc->filsGauche == NULL){ //Si le suivant est nul
-                    P = creerPosition(ligne,ordre,phrase);
-                    parc->filsGauche = creerNoeud(mot,P);
+                    parc->filsGauche = creerNoeud(mot,ligne,ordre,phrase);
                     index->nbMotsDistincts +=1;
                     index->nbMotsTotal +=1;
                     return 1;
@@ -99,9 +99,8 @@ int ajouterOccurence(T_Index *index, char *mot, int ligne, int ordre, int phrase
                 free(motparc);
             }
             else if(strcmp(motmin,motparc)>0){ //On va à droite
-                if(parc->filsDroite == NULL){ //Si le suivant est nul
-                    P = creerPosition(ligne,ordre,phrase);
-                    parc->filsDroite = creerNoeud(mot,P);
+                if(parc->filsDroite == NULL){ //Si le suivant est nul on rajoute le mot dans l'ABR
+                    parc->filsDroite = creerNoeud(mot,ligne,ordre,phrase);
                     index->nbMotsDistincts +=1;
                     index->nbMotsTotal +=1;
                     return 1;
@@ -120,4 +119,4 @@ int ajouterOccurence(T_Index *index, char *mot, int ligne, int ordre, int phrase
         }
         return 0;
     }
-}
+}//Permet d'ajouter un mot dans l'ABR. Si le mot existe déjà, on ajoute sa position dans la liste de position du mot, sinon, on l'ajoute dans le ABR.

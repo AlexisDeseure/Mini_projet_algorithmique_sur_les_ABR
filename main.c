@@ -5,8 +5,11 @@
 
 
 int main() {
-    char a[92] = "AghhgftvfvgGYUFYTyuyufg545645645+-+-+-...A,,,;;:;;,;:,zeygfyuzYGYUGUYGYUuyidfFTGgvhbjhjghjA";
+    /*char a[92] = "AghhgftvfvgGYUFYTyuyufg545645645+-+-+-...A,,,;;:;;,;:,zeygfyuzYGYUGUYGYUuyidfFTGgvhbjhjghjA";
+    char a2[99];
+    strcpy(a2,a);
     ignorerCasse(a);
-    printf("mot : %s, len = %d", a, strcmp("abc","bbc"));
+    printf("mot : %s\n", a);
+    printf("mot : %s\n", a2);*/
     return 0;
 }
