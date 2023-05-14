@@ -60,7 +60,7 @@ T_Position *ajouterPosition(T_Position *listeP, int ligne, int ordre, int phrase
         return P;
     }
     else{
-        while(pos_int->suivant != NULL && (pos_int->suivant->numeroLigne<P->numeroLigne || pos_int->suivant->ordre<P->ordre) ){
+        while(pos_int->suivant != NULL && (pos_int->suivant->numeroLigne<=P->numeroLigne) && ((pos_int->suivant->numeroLigne != P->numeroLigne)||(pos_int->suivant->ordre<P->ordre))){
             pos_int=pos_int->suivant;
         }
         P->suivant=pos_int->suivant;
@@ -70,22 +70,21 @@ T_Position *ajouterPosition(T_Position *listeP, int ligne, int ordre, int phrase
 }
 
 int ajouterOccurence(T_Index *index, char *mot, int ligne, int ordre, int phrase){
-    T_Noeud *parc = index->racine;
-    char *motparc;
-    char *motmin = mot;
     T_Position *P;
-    ignorerCasse(motmin); //Copie en minuscule du mot entré en paramètre pour ne pas le perdre
     if (index == NULL){
+        index = creerIndex();
         P = creerPosition(ligne,ordre,phrase);
         index->racine = creerNoeud(mot,P);
-        index->nbMotsDistincts=1;
-        index->nbMotsTotal=1;
+        index->nbMotsDistincts++;
+        index->nbMotsTotal++;
         return 1;
     }
     else{
+        T_Noeud *parc = index->racine;
+        char *motmin = mot;
+        ignorerCasse(motmin); //Copie en minuscule du mot entré en paramètre pour ne pas le perdre
         while(parc != NULL){
-            int len = strlen(parc->mot);
-            char *motparc = malloc(len*sizeof(char));
+            char *motparc = malloc(strlen(parc->mot)+1);
             strcpy(motparc,parc->mot);
             ignorerCasse(motparc);
             if(strcmp(motmin,motparc)<0){ // On va à gauche
@@ -111,7 +110,9 @@ int ajouterOccurence(T_Index *index, char *mot, int ligne, int ordre, int phrase
                 free(motparc);
             }
             else if(!strcmp(motmin,motparc)){ //Si le mot est déjà dans le ABR, on rajoute juste une occurence
-                ajouterPosition(parc->ListePositions, ligne, ordre, phrase);
+                if (!ajouterPosition(parc->ListePositions, ligne, ordre, phrase)){
+                    return 0;
+                }
                 parc->nbOccurences +=1;
                 index->nbMotsTotal +=1;
                 return 1;
