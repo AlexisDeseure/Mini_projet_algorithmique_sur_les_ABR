@@ -120,3 +120,24 @@ int ajouterOccurence(T_Index *index, char *mot, int ligne, int ordre, int phrase
         return 0;
     }
 }//Permet d'ajouter un mot dans l'ABR. Si le mot existe déjà, on ajoute sa position dans la liste de position du mot, sinon, on l'ajoute dans le ABR.
+
+int indexerFichier(T_Index *index, char *filename){
+    int n = 0; //Nombre de mots dans le texte
+    FILE *file = fopen(filename, "r");
+    if (file == NULL){ //Fichier n'existe pas ou erreur à l'ouverture.
+        printf("Le fichier '%s' n'a pas pu s'ouvrir.",filename);
+        fclose(file);
+        return 0;
+    }
+    else{
+        char *ligne;
+        fgets(ligne, 999, file);
+        char *mot = malloc(999*sizeof(char));
+        while(ligne != NULL){
+
+            fgets(ligne, 999, file);
+        }
+    }
+    fclose (file);
+    return n;
+}//Retourne 0 si il n'arrive pas à indexer les mots
