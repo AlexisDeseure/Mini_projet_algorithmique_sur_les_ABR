@@ -127,17 +127,66 @@ int indexerFichier(T_Index *index, char *filename){
     if (file == NULL){ //Fichier n'existe pas ou erreur à l'ouverture.
         printf("Le fichier '%s' n'a pas pu s'ouvrir.",filename);
         fclose(file);
-        return 0;
+        return -1;
     }
     else{
-        char *ligne;
-        fgets(ligne, 999, file);
-        char *mot = malloc(999*sizeof(char));
-        while(ligne != NULL){
-
-            fgets(ligne, 999, file);
+        // ouverture réussie : traitement du fichier
+        int ligne = 1;
+        int ordre = 0;
+        int phrase = 1;
+        char caractere = 0; //contiendra le caractère lu
+        char* motActuel = NULL;
+        char* motPrecedent = NULL;
+        int espaceMemoire = 1; //sert à stocker le nombre d'espace à allouer pour les chaines de caractères des mots
+        while((caractere = (char)fgetc(file))!= EOF){
+            //parcourt du fichier carctère par caractère
+            if (((caractere<='z') && (caractere>='a'))||((caractere<='Z') && (caractere>='A'))) {
+                if (espaceMemoire == 1) {
+                    ordre++;
+                }
+                espaceMemoire++;
+                if (motActuel == NULL) {
+                    motActuel = malloc(espaceMemoire);
+                    motActuel[espaceMemoire - 2] = caractere;
+                } else {
+                    motPrecedent = malloc(strlen(motActuel) + 1);
+                    strcpy(motPrecedent, motActuel);
+                    free(motActuel);
+                    motActuel = malloc(espaceMemoire);
+                    strcpy(motActuel, motPrecedent);
+                    motActuel[espaceMemoire - 2] = caractere;
+                    free(motPrecedent);
+                    motPrecedent = NULL;
+                }
+            }
+            else{
+                // cas où le caractère lu n'est pas une lettre on index alors le mot
+                // qui s'est terminé ou on ne fait rien si aucun mot avant
+                espaceMemoire = 1;
+                if (caractere == '.'){
+                    // cas où fin de phrase, on incrémente ainsi la phrase
+                    phrase++;
+                }
+                if (caractere == '\n'){
+                    // cas où saut de ligne : on réinitialise l'ordre et on l'ajoute au nombre total de mot
+                    n+=ordre;
+                    ordre = 0;
+                    ligne++;
+                }
+                if (motActuel != NULL){
+                    if (!ajouterOccurence(index,motActuel,ligne,ordre,phrase)){
+                        // ajout du mot dans l'index et test si l'ajout a échoué
+                        printf("L'ajout du mot '%s' a echoue", motActuel);
+                    }
+                    free(motActuel);
+                    motActuel=NULL;
+                }
+            }
+        }
+        if (ordre != 0){
+            n+=ordre;
         }
     }
     fclose (file);
     return n;
-}//Retourne 0 si il n'arrive pas à indexer les mots
+}//Retourne -1 si il n'arrive pas à indexer les mots
