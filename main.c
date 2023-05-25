@@ -11,5 +11,8 @@ int main() {
     ignorerCasse(a);
     printf("mot : %s\n", a);
     printf("mot : %s\n", a2);*/
+    T_Index *index = creerIndex();
+    printf("%d",indexerFichier(index, "../KEVIN.txt"));
+
     return 0;
 }
