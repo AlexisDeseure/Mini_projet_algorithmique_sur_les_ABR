@@ -74,16 +74,19 @@ T_Position *ajouterPosition(T_Position *listeP, int ligne, int ordre, int phrase
 
 int ajouterOccurence(T_Index *index, char *mot, int ligne, int ordre, int phrase){
     if (index == NULL){
-        index = creerIndex();
-        index->racine = creerNoeud(mot,ligne, ordre, phrase);
-        index->nbMotsDistincts++;
-        index->nbMotsTotal++;
-        return 1;
+        return 0;
     }
     else{
         T_Noeud *parc = index->racine;
-        char *motmin = mot;
+        char *motmin = malloc(strlen(mot)+1);
+        strcpy(motmin,mot);
         ignorerCasse(motmin); //Copie en minuscule du mot entré en paramètre pour ne pas le perdre
+        if (parc == NULL){
+            index->racine = creerNoeud(mot,ligne, ordre, phrase);
+            index->nbMotsDistincts++;
+            index->nbMotsTotal++;
+            return 1;
+        }
         while(parc != NULL){
             char *motparc = malloc(strlen(parc->mot)+1);
             strcpy(motparc,parc->mot);
@@ -148,6 +151,7 @@ int indexerFichier(T_Index *index, char *filename){
                 if (motActuel == NULL) {
                     motActuel = malloc(espaceMemoire);
                     motActuel[espaceMemoire - 2] = caractere;
+                    motActuel[espaceMemoire - 1] = '\0';
                 } else {
                     motPrecedent = malloc(strlen(motActuel) + 1);
                     strcpy(motPrecedent, motActuel);
@@ -155,6 +159,7 @@ int indexerFichier(T_Index *index, char *filename){
                     motActuel = malloc(espaceMemoire);
                     strcpy(motActuel, motPrecedent);
                     motActuel[espaceMemoire - 2] = caractere;
+                    motActuel[espaceMemoire - 1] = '\0';
                     free(motPrecedent);
                     motPrecedent = NULL;
                 }
@@ -176,7 +181,7 @@ int indexerFichier(T_Index *index, char *filename){
                 if (motActuel != NULL){
                     if (!ajouterOccurence(index,motActuel,ligne,ordre,phrase)){
                         // ajout du mot dans l'index et test si l'ajout a échoué
-                        printf("L'ajout du mot '%s' a echoue", motActuel);
+                        printf("\nL'ajout du mot '%s' a echoue\n", motActuel);
                     }
                     free(motActuel);
                     motActuel=NULL;
