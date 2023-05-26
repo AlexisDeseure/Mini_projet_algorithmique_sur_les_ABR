@@ -195,3 +195,15 @@ int indexerFichier(T_Index *index, char *filename){
     fclose (file);
     return n;
 }//Retourne -1 si il n'arrive pas à indexer les mots
+
+void afficherIndex(T_Index index){ // Il reste que à faire l'affichage formatté
+    T_Noeud *n = index.racine;
+    T_Index parcourir = index;
+    if (n != NULL){
+        parcourir.racine = n->filsGauche;
+        afficherIndex(parcourir); //Récursivité, on affiche les sous-arbres gauche
+        printf("%s\n",n->mot); //On affiche le mot
+        parcourir.racine = n->filsDroite;
+        afficherIndex(parcourir); //Récursivité, on affiche les sous-arbres droits
+    }
+}

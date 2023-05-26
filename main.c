@@ -12,7 +12,8 @@ int main() {
     printf("mot : %s\n", a);
     printf("mot : %s\n", a2);*/
     T_Index *index = creerIndex();
-    printf("%d",indexerFichier(index, "../KEVIN.txt"));
+    printf("%d\n",indexerFichier(index, "../KEVIN.txt"));
+    afficherIndex(*index);
 
     return 0;
 }
