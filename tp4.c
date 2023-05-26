@@ -202,7 +202,14 @@ void afficherIndex(T_Index index){ // Il reste que à faire l'affichage formatt�
     if (n != NULL){
         parcourir.racine = n->filsGauche;
         afficherIndex(parcourir); //Récursivité, on affiche les sous-arbres gauche
-        printf("%s\n",n->mot); //On affiche le mot
+
+        printf("|--%s\n",n->mot); //On affiche le mot
+        T_Position *pos = n->ListePositions; //On définit la position initiale
+        while (pos != NULL){ //Affichage des positions de chaque apparition du mot
+            printf("|----(l:%d, o:%d, p:%d)\n",pos->numeroLigne,pos->ordre,pos->numeroPhrase);
+            pos = pos->suivant;
+        }
+
         parcourir.racine = n->filsDroite;
         afficherIndex(parcourir); //Récursivité, on affiche les sous-arbres droits
     }
