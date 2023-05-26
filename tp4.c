@@ -43,6 +43,28 @@ T_Index* creerIndex() {
     return new;
 }
 
+Pile* creerPile(T_Noeud* noeud, int N){
+    Pile* new = malloc(sizeof(Pile));
+    if (new!=NULL) {
+        new->suivant = NULL;
+        new->N = N;
+        new->noeud = noeud;
+    }
+    return new;
+}
+
+void empiler(Pile** pile,T_Noeud* noeud, int N){
+    Pile *pileInter = creerPile(noeud,N);
+    pileInter->suivant = *pile;
+    *pile = pileInter;
+}
+
+Pile *depiler(Pile** pile){
+    Pile *pileInter = creerPile((*pile)->noeud,(*pile)->N);
+    *pile = (*pile)->suivant;
+    return pileInter;
+}
+
 void ignorerCasse(char* mot){
     if (mot == NULL || strcmp(mot, "\0") == 0){
         return;
@@ -191,26 +213,65 @@ int indexerFichier(T_Index *index, char *filename){
         if (ordre != 0){
             n+=ordre;
         }
+        if (motActuel != NULL){
+            if (!ajouterOccurence(index,motActuel,ligne,ordre,phrase)){
+                // ajout du mot dans l'index et test si l'ajout a échoué
+                printf("\nL'ajout du mot '%s' a echoue\n", motActuel);
+            }
+            free(motActuel);
+            motActuel=NULL;
+        }
     }
     fclose (file);
     return n;
 }//Retourne -1 si il n'arrive pas à indexer les mots
 
-void afficherIndex(T_Index index){ // Il reste que à faire l'affichage formatté
-    T_Noeud *n = index.racine;
-    T_Index parcourir = index;
-    if (n != NULL){
-        parcourir.racine = n->filsGauche;
-        afficherIndex(parcourir); //Récursivité, on affiche les sous-arbres gauche
 
-        printf("|--%s\n",n->mot); //On affiche le mot
-        T_Position *pos = n->ListePositions; //On définit la position initiale
-        while (pos != NULL){ //Affichage des positions de chaque apparition du mot
-            printf("|----(l:%d, o:%d, p:%d)\n",pos->numeroLigne,pos->ordre,pos->numeroPhrase);
-            pos = pos->suivant;
+
+
+void afficherIndex(T_Index index){
+    // on souhaite afficher l'index avec chacun des mots doté de leur première lettre en majuscule
+    // et selon un parcourt infixe itératif de l'arbre (ordre alphabétique)
+    T_Noeud *x = index.racine;
+    int N = 1;
+    Pile* pile = creerPile(NULL,0);
+    Pile* depile = NULL;
+    char* motmin  = NULL;
+    T_Position *pos = NULL;
+    char lettreActuelle = 0;
+    while ((pile->N != 0)||((N == 1) && (x != NULL))){
+        if ((N == 1)&&(x!=NULL)){
+            empiler(&pile, x, 1);
+            x = x->filsGauche;
         }
-
-        parcourir.racine = n->filsDroite;
-        afficherIndex(parcourir); //Récursivité, on affiche les sous-arbres droits
+        else{
+            depile = depiler(&pile);
+            x = depile->noeud;
+            N = depile->N;
+            free(depile);
+            depile = NULL;
+            if (N==1){
+                //on fait en sorte que seulement la 1ere lettre des mots soit en majuscule
+                motmin = malloc(strlen(x->mot)+1);
+                strcpy(motmin,x->mot);
+                ignorerCasse(motmin);
+                motmin[0] = (char)(motmin[0]-32);
+                if (motmin[0] != lettreActuelle){
+                    lettreActuelle = motmin[0];
+                    printf("\n%c\n", lettreActuelle);
+                }
+                printf("|-- %s\n",motmin); //On affiche le mot
+                free(motmin);
+                motmin = NULL; // on réinitialise le pointeur associé au motmin après avoir libéré la mémoire attribuée
+                pos = x->ListePositions; //On définit la position initiale
+                while (pos != NULL){ //Affichage des positions de chaque apparition du mot
+                    printf("|---- (l:%d, o:%d, p:%d)\n",pos->numeroLigne,pos->ordre,pos->numeroPhrase);
+                    pos = pos->suivant;
+                }
+                printf("|\n");
+                empiler(&pile,x,2);
+                x = x->filsDroite;
+            }
+        }
     }
 }

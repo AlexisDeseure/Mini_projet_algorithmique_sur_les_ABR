@@ -21,6 +21,15 @@ typedef struct Index{
     int nbMotsTotal;
 }T_Index;
 
+typedef struct Pile {
+    int N;
+    T_Noeud* noeud;
+    struct Pile* suivant;
+}Pile;
+
+Pile* creerPile(T_Noeud* noeud, int N);
+Pile *depiler(Pile** pile);
+void empiler(Pile** pile,T_Noeud* noeud, int N);
 //fonctions d'initialisation
 T_Position* creerPosition(int ligne, int ordre, int phrase);
 T_Noeud * creerNoeud(char* mot, int ligne, int ordre, int phrase);

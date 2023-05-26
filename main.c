@@ -14,6 +14,7 @@ int main() {
     T_Index *index = creerIndex();
     printf("%d\n",indexerFichier(index, "../KEVIN.txt"));
     afficherIndex(*index);
+    printf("\n%d,%d",index->nbMotsTotal,index->nbMotsDistincts);
 
     return 0;
 }
