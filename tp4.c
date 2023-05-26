@@ -199,10 +199,24 @@ int indexerFichier(T_Index *index, char *filename){
 void afficherIndex(T_Index index){ // Il reste que à faire l'affichage formatté
     T_Noeud *n = index.racine;
     T_Index parcourir = index;
-    if (n != NULL){
+    if (n != NULL){ //Pour chaque mot
+        //printf("%c\n",n->mot[0]);
         parcourir.racine = n->filsGauche;
         afficherIndex(parcourir); //Récursivité, on affiche les sous-arbres gauche
 
+        //char *motmin = malloc(strlen(mot)+1);
+        //strcpy(motmin,mot);
+        //ignorerCasse(motmin); //Copie en minuscule du mot entré en paramètre pour ne pas le perdre
+        char *prem = malloc(strlen(n->mot)+1);
+        char *premsuiv = malloc(strlen(n->filsGauche->mot)+1);
+        strcpy(prem,n->mot);
+        strcpy(premsuiv,n->filsGauche->mot);
+        ignorerCasse(prem);
+        ignorerCasse(premsuiv);
+        if (n->filsGauche!=NULL && prem[0] != premsuiv[0]){ //J'essaie de faire vérifier qu'on a changé de lettre (j'y arrive pas mdr)
+        printf("\n%c\n",n->filsGauche->mot[0]); //Affichage de la nouvelle lettre
+        }
+        free(premsuiv);
         printf("|--%s\n",n->mot); //On affiche le mot
         T_Position *pos = n->ListePositions; //On définit la position initiale
         while (pos != NULL){ //Affichage des positions de chaque apparition du mot
@@ -210,7 +224,16 @@ void afficherIndex(T_Index index){ // Il reste que à faire l'affichage formatt�
             pos = pos->suivant;
         }
 
+        premsuiv = malloc(strlen(n->filsDroite->mot)+1);
+        strcpy(premsuiv,n->filsDroite->mot);
+        ignorerCasse(prem);
+        ignorerCasse(premsuiv);
         parcourir.racine = n->filsDroite;
+        if (n->filsDroite!=NULL && prem[0] != premsuiv[0] ){ //J'essaie de faire vérifier qu'on a changé de lettre (j'y arrive pas mdr)
+            printf("\n%c\n",n->filsDroite->mot[0]); //Affichage de la nouvelle lettre
+        }
         afficherIndex(parcourir); //Récursivité, on affiche les sous-arbres droits
+        free(premsuiv);
+        free(prem);
     }
 }
