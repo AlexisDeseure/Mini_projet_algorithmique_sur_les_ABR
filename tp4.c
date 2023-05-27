@@ -101,6 +101,7 @@ int ajouterOccurence(T_Index *index, char *mot, int ligne, int ordre, int phrase
     else{
         T_Noeud *parc = index->racine;
         char *motmin = malloc(strlen(mot)+1);
+        char *motparc = NULL;
         strcpy(motmin,mot);
         ignorerCasse(motmin); //Copie en minuscule du mot entré en paramètre pour ne pas le perdre
         if (parc == NULL){
@@ -109,39 +110,44 @@ int ajouterOccurence(T_Index *index, char *mot, int ligne, int ordre, int phrase
             index->nbMotsTotal++;
             return 1;
         }
-        while(parc != NULL){
-            char *motparc = malloc(strlen(parc->mot)+1);
-            strcpy(motparc,parc->mot);
+        while(parc != NULL) {
+            motparc = malloc(strlen(parc->mot) + 1);
+            strcpy(motparc, parc->mot);
             ignorerCasse(motparc);
-            if(strcmp(motmin,motparc)<0){ // On va à gauche
-                if(parc->filsGauche == NULL){ //Si le suivant est nul
-                    parc->filsGauche = creerNoeud(mot,ligne,ordre,phrase);
-                    index->nbMotsDistincts +=1;
-                    index->nbMotsTotal +=1;
+            if (strcmp(motmin, motparc) < 0) { // On va à gauche
+                if (parc->filsGauche == NULL) { //Si le suivant est nul
+                    parc->filsGauche = creerNoeud(mot, ligne, ordre, phrase);
+                    index->nbMotsDistincts += 1;
+                    index->nbMotsTotal += 1;
+                    free(motparc);
+                    free(motmin);
                     return 1;
                 }
                 parc = parc->filsGauche;
-                free(motparc);
-            }
-            else if(strcmp(motmin,motparc)>0){ //On va à droite
-                if(parc->filsDroite == NULL){ //Si le suivant est nul on rajoute le mot dans l'ABR
-                    parc->filsDroite = creerNoeud(mot,ligne,ordre,phrase);
-                    index->nbMotsDistincts +=1;
-                    index->nbMotsTotal +=1;
+            } else if (strcmp(motmin, motparc) > 0) { //On va à droite
+                if (parc->filsDroite == NULL) { //Si le suivant est nul on rajoute le mot dans l'ABR
+                    parc->filsDroite = creerNoeud(mot, ligne, ordre, phrase);
+                    index->nbMotsDistincts += 1;
+                    index->nbMotsTotal += 1;
+                    free(motparc);
+                    free(motmin);
                     return 1;
                 }
                 parc = parc->filsDroite;
+            } else if (!strcmp(motmin, motparc)) { //Si le mot est déjà dans le ABR, on rajoute juste une occurence
                 free(motparc);
-            }
-            else if(!strcmp(motmin,motparc)){ //Si le mot est déjà dans le ABR, on rajoute juste une occurence
-                if (!ajouterPosition(parc->ListePositions, ligne, ordre, phrase)){
+                free(motmin);
+                if (!ajouterPosition(parc->ListePositions, ligne, ordre, phrase)) {
                     return 0;
                 }
-                parc->nbOccurences +=1;
-                index->nbMotsTotal +=1;
+                parc->nbOccurences += 1;
+                index->nbMotsTotal += 1;
                 return 1;
             }
+            free(motparc);
+            motparc = NULL;
         }
+        free(motmin);
         return 0;
     }
 }//Permet d'ajouter un mot dans l'ABR. Si le mot existe déjà, on ajoute sa position dans la liste de position du mot, sinon, on l'ajoute dans le ABR.
@@ -274,4 +280,52 @@ void afficherIndex(T_Index index){
             }
         }
     }
+    while (pile !=NULL){
+        // on libère la mémoire des potentiels éléments restant dans la pile
+        depile = pile;
+        pile = pile->suivant;
+        free(depile);
+    }
+}
+
+T_Noeud* rechercherMot(T_Index index, char *mot) {
+    // recherche si un mot est dans l'index en ignorant la casse
+    T_Noeud *x = index.racine;
+    char *motmin1 = NULL;
+    char *motmin2 = NULL;
+    motmin1 = malloc(strlen(mot)+1);
+    strcpy(motmin1,mot);
+    ignorerCasse(motmin1);
+    while (x!=NULL){
+        motmin2 = malloc(strlen(x->mot)+1);
+        strcpy(motmin2,x->mot);
+        ignorerCasse(motmin2);
+        if(strcmp(motmin1, motmin2)<0){
+            // on va à gauche
+            x = x->filsGauche;
+        }
+        else if(strcmp(motmin1, motmin2)>0){
+            // on va à droite
+            x = x->filsDroite;
+        }
+        else{
+            //mot trouvé
+            free(motmin1);
+            free(motmin2);
+            return x;
+        }
+
+        free(motmin2);
+        motmin2 = NULL;
+    }
+    free(motmin1);
+    return NULL;
+}
+
+void afficherOccurencesMot(T_Index index, char *mot){
+
+}
+
+void construireTexte(T_Index index, char *filename){
+
 }

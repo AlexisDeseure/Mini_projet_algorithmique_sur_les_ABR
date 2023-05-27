@@ -15,6 +15,12 @@ int main() {
     printf("%d\n",indexerFichier(index, "../KEVIN.txt"));
     afficherIndex(*index);
     printf("\n%d,%d",index->nbMotsTotal,index->nbMotsDistincts);
-
+    T_Noeud *n = rechercherMot(*index, "B");
+    if (n == NULL){
+        printf("\nnon");
+    }
+    else{
+        printf("\noui");
+    }
     return 0;
 }
