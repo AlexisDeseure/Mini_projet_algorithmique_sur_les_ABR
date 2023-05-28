@@ -16,5 +16,6 @@ int main() {
     afficherIndex(*index);
 //    printf("\n%d,%d",index->nbMotsTotal,index->nbMotsDistincts);
     afficherOccurencesMot(*index, "waS");
+    construireTexte(*index, "../result.txt");
     return 0;
 }

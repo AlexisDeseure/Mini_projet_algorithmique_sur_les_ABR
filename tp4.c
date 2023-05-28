@@ -512,8 +512,112 @@ void afficherOccurencesMot(T_Index index, char *mot){
         printf(".");
         phrase = phrase->suivant;
     }
+    while (phrase != NULL) {
+        Mot* motCourant = phrase->listeMot;
+        while (motCourant != NULL) {
+            Mot* motSuivant = motCourant->suivant;
+            free(motCourant->nom);
+            free(motCourant);
+            motCourant = motSuivant;
+        }
+
+        Phrase* phraseSuivante = phrase->suivant;
+        free(phrase);
+        phrase = phraseSuivante;
+    }
 }
 
 void construireTexte(T_Index index, char *filename){
+    // similaire à afficherOccurencesMot, elle parcourt l'arbre efficacement (prefixe), puis ajoute tous les mots
+    // dans les structures phrases et mot, elle réécrit ensuite dans l'ordre ces mots dans le fichier texte
+    FILE *file = fopen(filename, "w");
+    if (file == NULL){ //Fichier n'existe pas ou erreur à l'ouverture.
+        printf("Le fichier '%s' n'a pas pu s'ouvrir.",filename);
+        fclose(file);
+        return;
+    }
+    Pile * pile = creerPile(NULL,0); // on réutilise la structure similaire à une pile (LIFO) utilisé
+    // précédemment pour parcourir efficacement l'arbre
+    Pile * depile = NULL;
+    T_Position* pos = NULL;
+    Phrase* phrase = NULL;
+    Mot* motInte = NULL;
+    T_Noeud * r = index.racine;
+    if(r != NULL){
+        empiler(&pile, r, 1);
+    }
+    while(pile->N != 0){
+        // rangement des occurrences de tous les mots dans l'ordre à travers les structures Phrase et Mot
+        depile = depiler(&pile);
+        pos = depile->noeud->ListePositions;
+        while(pos != NULL){
+            ajouterMot(&phrase, pos->numeroLigne, pos->ordre, depile->noeud->mot, pos->numeroPhrase);
 
+            pos = pos->suivant;
+        }
+        if(depile->noeud->filsDroite != NULL){
+            empiler(&pile,depile->noeud->filsDroite, 1);
+        }
+        if(depile->noeud->filsGauche != NULL){
+            empiler(&pile,depile->noeud->filsGauche, 1);
+        }
+        free(depile);
+        depile = NULL;
+    }
+    int debut;
+    int ancienneLigne = 1;
+    int anciennePhrase = 0;
+    while (phrase!=NULL){
+        debut = 1;
+        motInte = phrase->listeMot;
+        if (anciennePhrase != phrase->numero) {
+            if (anciennePhrase !=0) {
+                for (int i = 0; i <= (phrase->numero - anciennePhrase - 1); i++) {
+                    fputc('.', file);
+                }
+                fputc(' ', file);
+            }
+        }
+        else
+            fputs(". ", file);
+        while (motInte!=NULL){
+            if (ancienneLigne != motInte->numeroLigne)
+                for (int i = 0; i <= (motInte->numeroLigne - ancienneLigne - 1); i++){
+                    fputc('\n', file);
+                }
+            if(debut) {
+                debut = 0;
+                motInte->nom[0] = (char)(motInte->nom[0]-32);
+                fputs(motInte->nom, file);
+                motInte->nom[0] = (char)(motInte->nom[0]+32);
+            }
+            else {
+                if (ancienneLigne == motInte->numeroLigne)
+                    fputc(' ', file);
+                fputs(motInte->nom, file);
+            }
+            ancienneLigne = motInte->numeroLigne;
+            motInte = motInte->suivant;
+        }
+        anciennePhrase = phrase->numero;
+        phrase = phrase->suivant;
+        if (phrase == NULL){
+            fputc('.', file);
+        }
+    }
+    printf("\nConstruction du texte effectuee !\n");
+    fclose (file);
+    while (phrase != NULL) {
+        Mot* motCourant = phrase->listeMot;
+        while (motCourant != NULL) {
+            Mot* motSuivant = motCourant->suivant;
+            free(motCourant->nom);
+            free(motCourant);
+            motCourant = motSuivant;
+        }
+
+        Phrase* phraseSuivante = phrase->suivant;
+        free(phrase);
+        phrase = phraseSuivante;
+    }
 }
