@@ -53,6 +53,27 @@ Pile* creerPile(T_Noeud* noeud, int N){
     return new;
 }
 
+Mot* creerMot(int ordre,int ligne,char* mot){
+    Mot* new = malloc(sizeof(Mot));
+    if (new!=NULL){
+        new->suivant = NULL;
+        new->ordre = ordre;
+        new->numeroLigne = ligne;
+        new->nom = malloc(strlen(mot)+1);
+        strcpy(new->nom, mot);
+    }
+    return new;
+}
+
+Phrase* creerPhrase(int n){
+    Phrase* new = malloc(sizeof(Phrase));
+    if (new!=NULL){
+        new->suivant = NULL;
+        new->listeMot = NULL;
+        new->numero = n;
+    }
+    return new;
+}
 void empiler(Pile** pile,T_Noeud* noeud, int N){
     Pile *pileInter = creerPile(noeud,N);
     pileInter->suivant = *pile;
@@ -76,6 +97,85 @@ void ignorerCasse(char* mot){
         }
         index++;
     }
+}
+
+Phrase* ajouterPhrase(Phrase** phrase, int n){
+    // ajoute une nouvelle phrase de numéro n dans la liste s'il elle n'existe pas déjà et renvoie un pointeur dessus
+    // si la phrase existe, la fonction permet de la rechercher
+    if (*phrase == NULL){
+        *phrase = creerPhrase(n);
+        return *phrase;
+    }
+    if (n < (*phrase)->numero){
+        Phrase* inte = creerPhrase(n);
+        inte->suivant = *phrase;
+        *phrase = inte;
+        return inte;
+    }
+    if (n == (*phrase)->numero){
+        return *phrase;
+    }
+    Phrase* actuelle = *phrase;
+    while (actuelle->suivant != NULL){
+        if(n < actuelle->suivant->numero){
+            Phrase* inte = creerPhrase(n);
+            inte->suivant = actuelle->suivant;
+            actuelle->suivant = inte;
+            return inte;
+        }
+        else if (n == actuelle->suivant->numero){
+            return actuelle->suivant;
+        }
+        actuelle = actuelle->suivant;
+    }
+    actuelle->suivant = creerPhrase(n);
+    return actuelle->suivant;
+}
+
+void ajouterMot(Phrase** phrase, int numeroLigne, int ordre, char* nom, int numeroPhrase){
+    //ajoute le mot doté des caractéristiques en paramètre dans sa phrase correspondante
+    Phrase* pInter = ajouterPhrase(phrase, numeroPhrase);
+    Mot* mInter = pInter->listeMot;
+    if (mInter == NULL){
+        pInter->listeMot = creerMot(ordre, numeroLigne, nom);
+        return;
+    }
+    if (numeroLigne < mInter->numeroLigne){
+        Mot* inte = creerMot(ordre, numeroLigne, nom);
+        inte->suivant = mInter;
+        pInter->listeMot = inte;
+        return;
+    }
+    else if ((numeroLigne == mInter->numeroLigne)&&(ordre <= mInter->ordre)){
+        if (ordre == mInter->ordre){
+            // le mot existe déjà donc pour éviter les doublons on ne le rajoute pas
+            return;
+        }
+        Mot* inte = creerMot(ordre, numeroLigne, nom);
+        inte->suivant = mInter;
+        pInter->listeMot = inte;
+        return;
+    }
+    while (mInter->suivant != NULL){
+        if(numeroLigne < mInter->suivant->numeroLigne){
+            Mot* inte = creerMot(ordre, numeroLigne, nom);
+            inte->suivant = mInter->suivant;
+            mInter->suivant = inte;
+            return;
+        }
+        else if ((numeroLigne == mInter->suivant->numeroLigne)&&(ordre <= mInter->suivant->ordre)){
+            if (ordre == mInter->suivant->ordre){
+                // le mot existe déjà donc pour éviter les doublons on ne le rajoute pas
+                return;
+            }
+            Mot* inte = creerMot(ordre, numeroLigne, nom);
+            inte->suivant = mInter->suivant;
+            mInter->suivant = inte;
+            return;
+        }
+        mInter = mInter->suivant;
+    }
+    mInter->suivant = creerMot(ordre, numeroLigne, nom);
 }
 
 T_Position *ajouterPosition(T_Position *listeP, int ligne, int ordre, int phrase){
@@ -105,7 +205,7 @@ int ajouterOccurence(T_Index *index, char *mot, int ligne, int ordre, int phrase
         strcpy(motmin,mot);
         ignorerCasse(motmin); //Copie en minuscule du mot entré en paramètre pour ne pas le perdre
         if (parc == NULL){
-            index->racine = creerNoeud(mot,ligne, ordre, phrase);
+            index->racine = creerNoeud(motmin,ligne, ordre, phrase);
             index->nbMotsDistincts++;
             index->nbMotsTotal++;
             return 1;
@@ -116,7 +216,7 @@ int ajouterOccurence(T_Index *index, char *mot, int ligne, int ordre, int phrase
             ignorerCasse(motparc);
             if (strcmp(motmin, motparc) < 0) { // On va à gauche
                 if (parc->filsGauche == NULL) { //Si le suivant est nul
-                    parc->filsGauche = creerNoeud(mot, ligne, ordre, phrase);
+                    parc->filsGauche = creerNoeud(motmin, ligne, ordre, phrase);
                     index->nbMotsDistincts += 1;
                     index->nbMotsTotal += 1;
                     free(motparc);
@@ -126,7 +226,7 @@ int ajouterOccurence(T_Index *index, char *mot, int ligne, int ordre, int phrase
                 parc = parc->filsGauche;
             } else if (strcmp(motmin, motparc) > 0) { //On va à droite
                 if (parc->filsDroite == NULL) { //Si le suivant est nul on rajoute le mot dans l'ABR
-                    parc->filsDroite = creerNoeud(mot, ligne, ordre, phrase);
+                    parc->filsDroite = creerNoeud(motmin, ligne, ordre, phrase);
                     index->nbMotsDistincts += 1;
                     index->nbMotsTotal += 1;
                     free(motparc);
@@ -196,10 +296,6 @@ int indexerFichier(T_Index *index, char *filename){
                 // cas où le caractère lu n'est pas une lettre on index alors le mot
                 // qui s'est terminé ou on ne fait rien si aucun mot avant
                 espaceMemoire = 1;
-                if (caractere == '.'){
-                    // cas où fin de phrase, on incrémente ainsi la phrase
-                    phrase++;
-                }
                 if (caractere == '\n'){
                     // cas où saut de ligne : on réinitialise l'ordre et on l'ajoute au nombre total de mot
                     n+=ordre;
@@ -213,6 +309,10 @@ int indexerFichier(T_Index *index, char *filename){
                     }
                     free(motActuel);
                     motActuel=NULL;
+                }
+                if (caractere == '.'){
+                    // cas où fin de phrase, on incrémente ainsi la phrase
+                    phrase++;
                 }
             }
         }
@@ -314,7 +414,6 @@ T_Noeud* rechercherMot(T_Index index, char *mot) {
             free(motmin2);
             return x;
         }
-
         free(motmin2);
         motmin2 = NULL;
     }
@@ -323,7 +422,96 @@ T_Noeud* rechercherMot(T_Index index, char *mot) {
 }
 
 void afficherOccurencesMot(T_Index index, char *mot){
-
+    //on fait en sorte que seulement la 1ere lettre du mot soit en majuscule
+    char *motmin = malloc(strlen(mot)+1);
+    T_Noeud* n = rechercherMot(index, mot);
+    if (n==NULL){
+        printf("\nCe mot n'est pas dans le texte.");
+        return;
+    }
+    strcpy(motmin,mot);
+    ignorerCasse(motmin);
+    motmin[0] = (char)(motmin[0]-32);
+    printf("\nMot = \"%s\"\nOcurrences = %d", motmin, n->nbOccurences);
+    free(motmin);
+    //on parcourt ensuite itérativement l'arbre avec la méthode prefixe en ajoutant tous les mots de la même
+    //phrase dans une structure associée
+    T_Noeud * r = index.racine;
+    Pile * pile = creerPile(NULL,0); // on réutilise la structure similaire à une pile (LIFO) utilisé
+    // précédemment pour parcourir efficacement l'arbre
+    Pile * depile = NULL;
+    T_Position* pos = n->ListePositions;
+    T_Position* pos2 = NULL;
+    Phrase* phrase = NULL;
+    Mot* motInte = NULL;
+    if(r != NULL){
+        empiler(&pile, r, 1);
+    }
+    while(pile->N != 0){
+        depile = depiler(&pile);
+        while(pos != NULL){
+            pos2 = depile->noeud->ListePositions;
+            while (pos2 != NULL){
+                if (pos->numeroPhrase == pos2->numeroPhrase){
+                    ajouterMot(&phrase, pos2->numeroLigne, pos2->ordre, depile->noeud->mot, pos2->numeroPhrase);
+                }
+                pos2 = pos2->suivant;
+            }
+            pos = pos->suivant;
+        }
+        if(depile->noeud->filsDroite != NULL){
+            empiler(&pile,depile->noeud->filsDroite, 1);
+        }
+        if(depile->noeud->filsGauche != NULL){
+            empiler(&pile,depile->noeud->filsGauche, 1);
+        }
+        pos = n->ListePositions;
+        free(depile);
+        depile = NULL;
+    }
+    free(pile);
+    //après avoir établi la liste chainée contenant les phrases dans lesquels apparait le mot, on les affiche
+    int debut;
+    int numeroPhrase = 0;
+    pos2 = pos;
+    while ((phrase!=NULL) && (pos!=NULL)){
+        numeroPhrase = pos->numeroPhrase; // on stocke le numéro de phrase actuel de l'occurrence du mot recherché
+        printf("\n| Ligne %d", pos->numeroLigne);
+        pos2 = pos;
+        while ((pos->suivant != NULL) && (numeroPhrase == pos->suivant->numeroPhrase)){
+            // cette boucle est nécessaire pour que l'affichage corresponde bien lorsqu'on a plusieurs fois le mot
+            // recherché dans une phrase. (pour la ligne)
+            printf("-%d",pos->suivant->numeroLigne);
+            pos = pos->suivant;
+        }
+        pos = pos2;
+        printf(", mot %d", pos->ordre);
+        // on refait la boucle pour l'ordre (on aurait pu créer 2 chaines de caractères simultanément dans 1 seule boucle sinon)
+        while ((pos->suivant != NULL) && (numeroPhrase == pos->suivant->numeroPhrase)){
+            // cette boucle est nécessaire pour que l'affichage corresponde bien lorsqu'on a plusieurs fois le mot
+            // recherché dans une phrase. (pour l'ordre)
+            printf("-%d",pos->suivant->ordre);
+            pos = pos->suivant;
+        }
+        pos = pos->suivant;
+        printf(" :");
+        motInte = phrase->listeMot;
+        debut = 1;
+        while (motInte!=NULL){
+            if(debut) {
+                debut = 0;
+                motInte->nom[0] = (char)(motInte->nom[0]-32);
+                printf(" %s", motInte->nom);
+                motInte->nom[0] = (char)(motInte->nom[0]+32);
+            }
+            else {
+                printf(" %s", motInte->nom);
+            }
+            motInte = motInte->suivant;
+        }
+        printf(".");
+        phrase = phrase->suivant;
+    }
 }
 
 void construireTexte(T_Index index, char *filename){

@@ -14,13 +14,7 @@ int main() {
     T_Index *index = creerIndex();
     printf("%d\n",indexerFichier(index, "../KEVIN.txt"));
     afficherIndex(*index);
-    printf("\n%d,%d",index->nbMotsTotal,index->nbMotsDistincts);
-    T_Noeud *n = rechercherMot(*index, "B");
-    if (n == NULL){
-        printf("\nnon");
-    }
-    else{
-        printf("\noui");
-    }
+//    printf("\n%d,%d",index->nbMotsTotal,index->nbMotsDistincts);
+    afficherOccurencesMot(*index, "waS");
     return 0;
 }
