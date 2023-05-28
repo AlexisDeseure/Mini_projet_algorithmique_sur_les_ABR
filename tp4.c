@@ -621,3 +621,40 @@ void construireTexte(T_Index index, char *filename){
         phrase = phraseSuivante;
     }
 }
+
+// Vider le buffer (utile quand on utlise des getchar() )
+void viderBuffer() {
+    int c = 0;
+    while (c != '\n' && c != EOF) { // feof(stdin) renvoie une valeur non nulle si le buffer est vide
+        c = getchar();
+    }
+}
+
+//fonctions libératrices
+void libererIndex(T_Index* index) {
+    if(index == NULL){
+        return;
+    }
+    libererNoeud(index->racine);
+    free(index);
+}
+
+void libererNoeud(T_Noeud* noeud) {
+    if (noeud == NULL) {
+        return;
+    }
+
+    libererNoeud(noeud->filsGauche);
+    libererNoeud(noeud->filsDroite);
+    libererPosition(noeud->ListePositions);
+    free(noeud->mot);
+    free(noeud);
+}
+
+void libererPosition(T_Position* position) {
+    while (position != NULL) {
+        T_Position* positionSuivante = position->suivant;
+        free(position);
+        position = positionSuivante;
+    }
+}

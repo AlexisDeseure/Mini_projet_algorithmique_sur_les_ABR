@@ -40,6 +40,7 @@ typedef struct Phrase { //stocke les phrases et leur numéro associé
     struct Phrase* suivant;
 }Phrase;
 
+void viderBuffer();
 Mot* creerMot(int ordre,int ligne,char* mot);
 Phrase* creerPhrase(int n);
 Phrase* ajouterPhrase(Phrase** phrase, int n);
@@ -66,7 +67,10 @@ void afficherOccurencesMot(T_Index index, char *mot);
 
 void construireTexte(T_Index index, char *filename);
 
-
+//fonctions libératrices
+void libererIndex(T_Index* index);
+void libererNoeud(T_Noeud* noeud);
+void libererPosition(T_Position* position);
 
 
 #endif //TP4_TP4_H
