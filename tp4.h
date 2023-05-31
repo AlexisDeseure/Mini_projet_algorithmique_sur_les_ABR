@@ -21,6 +21,33 @@ typedef struct Index{
     int nbMotsTotal;
 }T_Index;
 
+typedef struct Pile {
+    int N;
+    T_Noeud* noeud;
+    struct Pile* suivant;
+}Pile;
+
+typedef struct Mot { //stocke les mots des phrase dans l'ordre dans lequel ils apparaissent dans la phrase
+    int numeroLigne;
+    int ordre;
+    char* nom;
+    struct Mot* suivant;
+}Mot;
+
+typedef struct Phrase { //stocke les phrases et leur numéro associé
+    int numero;
+    Mot* listeMot;
+    struct Phrase* suivant;
+}Phrase;
+
+void viderBuffer();
+Mot* creerMot(int ordre,int ligne,char* mot);
+Phrase* creerPhrase(int n);
+Phrase* ajouterPhrase(Phrase** phrase, int n);
+void ajouterMot(Phrase** phrase, int numeroLigne, int ordre, char* nom, int numeroPhrase);
+Pile* creerPile(T_Noeud* noeud, int N);
+Pile *depiler(Pile** pile);
+void empiler(Pile** pile,T_Noeud* noeud, int N);
 //fonctions d'initialisation
 T_Position* creerPosition(int ligne, int ordre, int phrase);
 T_Noeud * creerNoeud(char* mot, int ligne, int ordre, int phrase);
@@ -40,7 +67,10 @@ void afficherOccurencesMot(T_Index index, char *mot);
 
 void construireTexte(T_Index index, char *filename);
 
-
+//fonctions libératrices
+void libererIndex(T_Index* index);
+void libererNoeud(T_Noeud* noeud);
+void libererPosition(T_Position* position);
 
 
 #endif //TP4_TP4_H
