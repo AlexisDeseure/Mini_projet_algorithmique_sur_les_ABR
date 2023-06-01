@@ -273,22 +273,23 @@ int indexerFichier(T_Index *index, char *filename){
             //parcourt du fichier carctère par caractère
             if (((caractere<='z') && (caractere>='a'))||((caractere<='Z') && (caractere>='A'))) {
                 if (espaceMemoire == 1) {
-                    ordre++;
+                    ordre++; //On compte le passage au mot suivant, on va commencer l'enregistrement d'un mot
                 }
                 espaceMemoire++;
-                if (motActuel == NULL) {
-                    motActuel = malloc(espaceMemoire);
+                if (motActuel == NULL) { //Espace mémoire est à minimum 2
+                    motActuel = malloc(espaceMemoire); //Espace mémoire supérieur au nombre de caractères
                     motActuel[espaceMemoire - 2] = caractere;
                     motActuel[espaceMemoire - 1] = '\0';
-                } else {
-                    motPrecedent = malloc(strlen(motActuel) + 1);
-                    strcpy(motPrecedent, motActuel);
+                }
+                else { //Le mot n'est pas vide, on rajoute un espace mémoire
+                    motPrecedent = malloc(strlen(motActuel) + 1); //On alloque la taille du mot
+                    strcpy(motPrecedent, motActuel); //On copie le mot dans motPrecedent pour ne pas le perdre
                     free(motActuel);
-                    motActuel = malloc(espaceMemoire);
-                    strcpy(motActuel, motPrecedent);
-                    motActuel[espaceMemoire - 2] = caractere;
-                    motActuel[espaceMemoire - 1] = '\0';
-                    free(motPrecedent);
+                    motActuel = malloc(espaceMemoire);//Longueur du motPrecedent + 1, pour mettre la dernière lettre en plus
+                    strcpy(motActuel, motPrecedent); //On remet le mot dans la variable actuelle
+                    motActuel[espaceMemoire - 2] = caractere; //On met le nouveau caractère à la place de \0
+                    motActuel[espaceMemoire - 1] = '\0'; //On replace \0 dans le texte
+                    free(motPrecedent); //On libère motPrecedent pour pouvoir rajouter des lettres après
                     motPrecedent = NULL;
                 }
             }
