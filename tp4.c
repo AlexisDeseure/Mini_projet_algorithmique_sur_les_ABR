@@ -293,8 +293,8 @@ int indexerFichier(T_Index *index, char *filename){
                 }
             }
             else{
-                // cas où le caractère lu n'est pas une lettre on index alors le mot
-                // qui s'est terminé ou on ne fait rien si aucun mot avant
+                // cas où le caractère lu n'est pas une lettre on index alors le mot est fini
+                // on ne fait rien si aucun mot avant
                 espaceMemoire = 1;
                 if (caractere == '\n'){
                     // cas où saut de ligne : on réinitialise l'ordre et on l'ajoute au nombre total de mot
@@ -302,12 +302,12 @@ int indexerFichier(T_Index *index, char *filename){
                     ordre = 0;
                     ligne++;
                 }
-                if (motActuel != NULL){
-                    if (!ajouterOccurence(index,motActuel,ligne,ordre,phrase)){
+                if (motActuel != NULL){ //Le mot est écrit, et on est tombés sur un caractère spécial, on l'enregistre
+                    if (!ajouterOccurence(index,motActuel,ligne,ordre,phrase)){ //On ajoute le mot à l'index et on vérifie si ça a marché
                         // ajout du mot dans l'index et test si l'ajout a échoué
                         printf("\nL'ajout du mot '%s' a echoue\n", motActuel);
                     }
-                    free(motActuel);
+                    free(motActuel); //On libère la mémoire pour créer un nouveau mot après
                     motActuel=NULL;
                 }
                 if (caractere == '.'){
