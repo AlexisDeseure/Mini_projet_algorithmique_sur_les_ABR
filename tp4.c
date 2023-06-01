@@ -305,14 +305,14 @@ int indexerFichier(T_Index *index, char *filename){
                 if (motActuel != NULL){ //Le mot est écrit, et on est tombés sur un caractère spécial, on l'enregistre
                     if (!ajouterOccurence(index,motActuel,ligne,ordre,phrase)){ //On ajoute le mot à l'index et on vérifie si ça a marché
                         // ajout du mot dans l'index et test si l'ajout a échoué
-                        printf("\nL'ajout du mot '%s' a echoue\n", motActuel);
+                        printf("\nL'ajout du mot '%s' a echoue\n", motActuel); //Message d'erreur
                     }
                     free(motActuel); //On libère la mémoire pour créer un nouveau mot après
                     motActuel=NULL;
                 }
                 if (caractere == '.'){
                     // cas où fin de phrase, on incrémente ainsi la phrase
-                    phrase++;
+                    phrase++; //On compte le passage à la phrase suivante
                 }
             }
         }
