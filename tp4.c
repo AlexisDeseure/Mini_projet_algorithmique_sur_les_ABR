@@ -199,7 +199,7 @@ int ajouterOccurence(T_Index *index, char *mot, int ligne, int ordre, int phrase
         return 0;
     }
     else{
-        T_Noeud *parc = index->racine;
+        T_Noeud *parc = index->racine; //On crée un noeud qui parcourt l'index
         char *motmin = malloc(strlen(mot)+1);
         char *motparc = NULL;
         strcpy(motmin,mot);
