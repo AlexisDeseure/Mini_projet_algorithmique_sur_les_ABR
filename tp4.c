@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "tp4.h"
+
+
+//====================  Fonctions d'initialisation des structures  ====================
+
+// Initialise une position
 T_Position* creerPosition(int ligne, int ordre, int phrase){
     T_Position *new = malloc(sizeof(T_Position));
     if (new!=NULL) {
@@ -14,7 +19,7 @@ T_Position* creerPosition(int ligne, int ordre, int phrase){
     return new;
 }
 
-
+// Initialise un noeud
 T_Noeud * creerNoeud(char* mot, int ligne, int ordre, int phrase){
     T_Noeud *new = malloc(sizeof(T_Noeud));
     T_Position *P = creerPosition(ligne, ordre, phrase);
@@ -32,6 +37,7 @@ T_Noeud * creerNoeud(char* mot, int ligne, int ordre, int phrase){
 }//Crée un noeud, et rajoute une position en son début
 //On ne se sert plus d'une position en entrée, on met toutes les données du noeud, cela permet à faire moins de lignes de code quand on veut créer un nouveau noeud, car on doit pas créer la position à chaque fois
 
+// Initialise un index
 T_Index* creerIndex() {
     T_Index * new= malloc(sizeof(T_Index));
     if (new!=NULL){
@@ -43,6 +49,7 @@ T_Index* creerIndex() {
     return new;
 }
 
+// Initialise une pile
 Pile* creerPile(T_Noeud* noeud, int N){
     Pile* new = malloc(sizeof(Pile));
     if (new!=NULL) {
@@ -53,6 +60,7 @@ Pile* creerPile(T_Noeud* noeud, int N){
     return new;
 }
 
+// Initialise un mot
 Mot* creerMot(int ordre,int ligne,char* mot){
     Mot* new = malloc(sizeof(Mot));
     if (new!=NULL){
@@ -65,6 +73,7 @@ Mot* creerMot(int ordre,int ligne,char* mot){
     return new;
 }
 
+// Initialise une phrase
 Phrase* creerPhrase(int n){
     Phrase* new = malloc(sizeof(Phrase));
     if (new!=NULL){
@@ -74,109 +83,9 @@ Phrase* creerPhrase(int n){
     }
     return new;
 }
-void empiler(Pile** pile,T_Noeud* noeud, int N){
-    Pile *pileInter = creerPile(noeud,N);
-    pileInter->suivant = *pile;
-    *pile = pileInter;
-}
 
-Pile *depiler(Pile** pile){
-    Pile *pileInter = creerPile((*pile)->noeud,(*pile)->N);
-    *pile = (*pile)->suivant;
-    return pileInter;
-}
 
-void ignorerCasse(char* mot){
-    if (mot == NULL || strcmp(mot, "\0") == 0){
-        return;
-    }
-    int index = 0;
-    while (mot[index]!='\0'){
-        if (mot[index]>=65 && mot[index]<=90){
-            mot[index]+=32;
-        }
-        index++;
-    }
-}
-
-Phrase* ajouterPhrase(Phrase** phrase, int n){
-    // ajoute une nouvelle phrase de numéro n dans la liste s'il elle n'existe pas déjà et renvoie un pointeur dessus
-    // si la phrase existe, la fonction permet de la rechercher
-    if (*phrase == NULL){
-        *phrase = creerPhrase(n);
-        return *phrase;
-    }
-    if (n < (*phrase)->numero){
-        Phrase* inte = creerPhrase(n);
-        inte->suivant = *phrase;
-        *phrase = inte;
-        return inte;
-    }
-    if (n == (*phrase)->numero){
-        return *phrase;
-    }
-    Phrase* actuelle = *phrase;
-    while (actuelle->suivant != NULL){
-        if(n < actuelle->suivant->numero){
-            Phrase* inte = creerPhrase(n);
-            inte->suivant = actuelle->suivant;
-            actuelle->suivant = inte;
-            return inte;
-        }
-        else if (n == actuelle->suivant->numero){
-            return actuelle->suivant;
-        }
-        actuelle = actuelle->suivant;
-    }
-    actuelle->suivant = creerPhrase(n);
-    return actuelle->suivant;
-}
-
-void ajouterMot(Phrase** phrase, int numeroLigne, int ordre, char* nom, int numeroPhrase){
-    //ajoute le mot doté des caractéristiques en paramètre dans sa phrase correspondante
-    Phrase* pInter = ajouterPhrase(phrase, numeroPhrase);
-    Mot* mInter = pInter->listeMot;
-    if (mInter == NULL){
-        pInter->listeMot = creerMot(ordre, numeroLigne, nom);
-        return;
-    }
-    if (numeroLigne < mInter->numeroLigne){
-        Mot* inte = creerMot(ordre, numeroLigne, nom);
-        inte->suivant = mInter;
-        pInter->listeMot = inte;
-        return;
-    }
-    else if ((numeroLigne == mInter->numeroLigne)&&(ordre <= mInter->ordre)){
-        if (ordre == mInter->ordre){
-            // le mot existe déjà donc pour éviter les doublons on ne le rajoute pas
-            return;
-        }
-        Mot* inte = creerMot(ordre, numeroLigne, nom);
-        inte->suivant = mInter;
-        pInter->listeMot = inte;
-        return;
-    }
-    while (mInter->suivant != NULL){
-        if(numeroLigne < mInter->suivant->numeroLigne){
-            Mot* inte = creerMot(ordre, numeroLigne, nom);
-            inte->suivant = mInter->suivant;
-            mInter->suivant = inte;
-            return;
-        }
-        else if ((numeroLigne == mInter->suivant->numeroLigne)&&(ordre <= mInter->suivant->ordre)){
-            if (ordre == mInter->suivant->ordre){
-                // le mot existe déjà donc pour éviter les doublons on ne le rajoute pas
-                return;
-            }
-            Mot* inte = creerMot(ordre, numeroLigne, nom);
-            inte->suivant = mInter->suivant;
-            mInter->suivant = inte;
-            return;
-        }
-        mInter = mInter->suivant;
-    }
-    mInter->suivant = creerMot(ordre, numeroLigne, nom);
-}
+//====================  Fonctions principales  ====================
 
 T_Position *ajouterPosition(T_Position *listeP, int ligne, int ordre, int phrase){
     T_Position *pos_int = listeP;
@@ -331,9 +240,6 @@ int indexerFichier(T_Index *index, char *filename){
     fclose (file);
     return n;
 }//Retourne -1 si il n'arrive pas à indexer les mots
-
-
-
 
 void afficherIndex(T_Index index){
     // on souhaite afficher l'index avec chacun des mots doté de leur première lettre en majuscule
@@ -520,7 +426,6 @@ void afficherOccurencesMot(T_Index index, char *mot){
             free(motCourant);
             motCourant = motSuivant;
         }
-
         Phrase* phraseSuivante = phrase->suivant;
         free(phrase);
         phrase = phraseSuivante;
@@ -622,6 +527,118 @@ void construireTexte(T_Index index, char *filename){
     }
 }
 
+
+//====================  Fonctions supplémentaires  ====================
+
+//empiler un élément
+void empiler(Pile** pile,T_Noeud* noeud, int N){
+    Pile *pileInter = creerPile(noeud,N);
+    pileInter->suivant = *pile;
+    *pile = pileInter;
+}
+
+//dépiler un élément
+Pile *depiler(Pile** pile){
+    Pile *pileInter = creerPile((*pile)->noeud,(*pile)->N);
+    *pile = (*pile)->suivant;
+    return pileInter;
+}
+
+//recherche une phrase ou la créer
+Phrase* ajouterPhrase(Phrase** phrase, int n){
+    // ajoute une nouvelle phrase de numéro n dans la liste s'il elle n'existe pas déjà et renvoie un pointeur dessus
+    // si la phrase existe, la fonction permet de la rechercher
+    if (*phrase == NULL){
+        *phrase = creerPhrase(n);
+        return *phrase;
+    }
+    if (n < (*phrase)->numero){
+        Phrase* inte = creerPhrase(n);
+        inte->suivant = *phrase;
+        *phrase = inte;
+        return inte;
+    }
+    if (n == (*phrase)->numero){
+        return *phrase;
+    }
+    Phrase* actuelle = *phrase;
+    while (actuelle->suivant != NULL){
+        if(n < actuelle->suivant->numero){
+            Phrase* inte = creerPhrase(n);
+            inte->suivant = actuelle->suivant;
+            actuelle->suivant = inte;
+            return inte;
+        }
+        else if (n == actuelle->suivant->numero){
+            return actuelle->suivant;
+        }
+        actuelle = actuelle->suivant;
+    }
+    actuelle->suivant = creerPhrase(n);
+    return actuelle->suivant;
+}
+
+//ajoute un mot dans sa phrase et la créer si besoin
+void ajouterMot(Phrase** phrase, int numeroLigne, int ordre, char* nom, int numeroPhrase){
+    //ajoute le mot doté des caractéristiques en paramètre dans sa phrase correspondante
+    Phrase* pInter = ajouterPhrase(phrase, numeroPhrase);
+    Mot* mInter = pInter->listeMot;
+    if (mInter == NULL){
+        pInter->listeMot = creerMot(ordre, numeroLigne, nom);
+        return;
+    }
+    if (numeroLigne < mInter->numeroLigne){
+        Mot* inte = creerMot(ordre, numeroLigne, nom);
+        inte->suivant = mInter;
+        pInter->listeMot = inte;
+        return;
+    }
+    else if ((numeroLigne == mInter->numeroLigne)&&(ordre <= mInter->ordre)){
+        if (ordre == mInter->ordre){
+            // le mot existe déjà donc pour éviter les doublons on ne le rajoute pas
+            return;
+        }
+        Mot* inte = creerMot(ordre, numeroLigne, nom);
+        inte->suivant = mInter;
+        pInter->listeMot = inte;
+        return;
+    }
+    while (mInter->suivant != NULL){
+        if(numeroLigne < mInter->suivant->numeroLigne){
+            Mot* inte = creerMot(ordre, numeroLigne, nom);
+            inte->suivant = mInter->suivant;
+            mInter->suivant = inte;
+            return;
+        }
+        else if ((numeroLigne == mInter->suivant->numeroLigne)&&(ordre <= mInter->suivant->ordre)){
+            if (ordre == mInter->suivant->ordre){
+                // le mot existe déjà donc pour éviter les doublons on ne le rajoute pas
+                return;
+            }
+            Mot* inte = creerMot(ordre, numeroLigne, nom);
+            inte->suivant = mInter->suivant;
+            mInter->suivant = inte;
+            return;
+        }
+        mInter = mInter->suivant;
+    }
+    mInter->suivant = creerMot(ordre, numeroLigne, nom);
+}
+
+// Met le mot passé en paramètre en minuscule
+void ignorerCasse(char* mot){
+    if (mot == NULL || strcmp(mot, "\0") == 0){
+        return;
+    }
+    int index = 0;
+    while (mot[index]!='\0'){
+        if (mot[index]>=65 && mot[index]<=90){
+            mot[index]+=32;
+        }
+        index++;
+    }
+}
+
 // Vider le buffer (utile quand on utlise des getchar() )
 void viderBuffer() {
     int c = 0;
@@ -630,7 +647,9 @@ void viderBuffer() {
     }
 }
 
-//fonctions libératrices
+//====================  Fonctions libératrices  ====================
+
+//libère l'index
 void libererIndex(T_Index* index) {
     if(index == NULL){
         return;
@@ -639,11 +658,11 @@ void libererIndex(T_Index* index) {
     free(index);
 }
 
+//libère les noeuds
 void libererNoeud(T_Noeud* noeud) {
     if (noeud == NULL) {
         return;
     }
-
     libererNoeud(noeud->filsGauche);
     libererNoeud(noeud->filsDroite);
     libererPosition(noeud->ListePositions);
@@ -651,6 +670,7 @@ void libererNoeud(T_Noeud* noeud) {
     free(noeud);
 }
 
+//libère les positions d'une liste
 void libererPosition(T_Position* position) {
     while (position != NULL) {
         T_Position* positionSuivante = position->suivant;
