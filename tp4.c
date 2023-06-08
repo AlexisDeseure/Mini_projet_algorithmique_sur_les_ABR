@@ -205,12 +205,6 @@ int indexerFichier(T_Index *index, char *filename){
                 // cas où le caractère lu n'est pas une lettre on index alors le mot est fini
                 // on ne fait rien si aucun mot avant
                 espaceMemoire = 1;
-                if (caractere == '\n'){
-                    // cas où saut de ligne : on réinitialise l'ordre et on l'ajoute au nombre total de mot
-                    n+=ordre;
-                    ordre = 0;
-                    ligne++;
-                }
                 if (motActuel != NULL){ //Le mot est écrit, et on est tombés sur un caractère spécial, on l'enregistre
                     if (!ajouterOccurence(index,motActuel,ligne,ordre,phrase)){ //On ajoute le mot à l'index et on vérifie si ça a marché
                         // ajout du mot dans l'index et test si l'ajout a échoué
@@ -218,6 +212,12 @@ int indexerFichier(T_Index *index, char *filename){
                     }
                     free(motActuel); //On libère la mémoire pour créer un nouveau mot après
                     motActuel=NULL;
+                }
+                if (caractere == '\n'){
+                    // cas où saut de ligne : on réinitialise l'ordre et on l'ajoute au nombre total de mot
+                    n+=ordre;
+                    ordre = 0;
+                    ligne++;
                 }
                 if (caractere == '.'){
                     // cas où fin de phrase, on incrémente ainsi la phrase

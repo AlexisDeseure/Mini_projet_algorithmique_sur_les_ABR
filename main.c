@@ -7,6 +7,7 @@
 int main() {
     T_Index *index = NULL;
     int choix = 0;
+    int nbmots = 0;
     char str[1000]; // initialisation de la chaine de caractères qui contiendra les noms des éléments à ajouter
     T_Noeud * noeud = NULL;
     char* motmin = NULL;
@@ -33,21 +34,35 @@ int main() {
                     fgets(str, 1000,
                           stdin); // récupère au maximum les 999 caractères écris dans la console et les stocke dans la variable str
                     str[strcspn(str, "\n")] = '\0'; // remplace le premier saut de ligne par le caractère de fin
-                    printf("\n%d mot(s) lu(s)", indexerFichier(index, str));
+                    nbmots = indexerFichier(index, str);
+                    if (nbmots==-1){
+                        printf("\nVeuillez reessayer");
+                        libererIndex(index);
+                        index = NULL;
+                        break;
+                    }
+                    printf("\n%d mot(s) lu(s)", nbmots);
                 }
                 else{
                     printf("\nUn fichier a deja ete charge. Voulez vous le desindexer et en charger un autre (Y/n):");
                     choix = getchar();
                     viderBuffer();
                     if (choix != 'n') {
-                        libererIndex(index);
-                        index = NULL;
-                        index = creerIndex();
                         printf("\nEntrez le chemin du fichier a charger:");
                         fgets(str, 1000,
                               stdin); // récupère au maximum les 999 caractères écris dans la console et les stocke dans la variable str
                         str[strcspn(str, "\n")] = '\0'; // remplace le premier saut de ligne par le caractère de fin
-                        printf("\n%d mot(s) lu(s)", indexerFichier(index, str));
+                        libererIndex(index);
+                        index = NULL;
+                        index = creerIndex();
+                        nbmots = indexerFichier(index, str);
+                        if (nbmots==-1){
+                            printf("\nL' ancien fichier a ete desindexer mais le nouveau fichier n'a pas ete trouve. Veuillez reessayer");
+                            libererIndex(index);
+                            index = NULL;
+                            break;
+                        }
+                        printf("\n%d mot(s) lu(s)", nbmots);
                     }
                 }
                 break;
