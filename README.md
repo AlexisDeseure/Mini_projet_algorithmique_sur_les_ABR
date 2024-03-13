@@ -1,4 +1,4 @@
-﻿# Projet de TP réalisé centré sur les arbres binaires de recherche dans le cadre d'une matière d'algorithmique à l'UTC
+﻿# Projet de TP centré sur les arbres binaires de recherche dans le cadre d'une matière d'algorithmique à l'UTC
 
 Dans ce TP, nous utiliserons les arbres binaires de recherche pour implémenter un exemple d'indexation et de recherche sur un fichier contenant un texte quelconque.
 L'arbre binaire de recherche contiendra tous les mots présents dans le texte à indexer :
